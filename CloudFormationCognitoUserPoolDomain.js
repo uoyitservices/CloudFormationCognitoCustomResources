@@ -6,19 +6,22 @@ exports.handler = async (event) => {
         
         switch (event.RequestType) {
             case 'Create':
-                await cognitoIdentityServiceProvider.createUserPoolDomain({
-                    UserPoolId: event.ResourceProperties.UserPoolId,
-                    Domain: event.ResourceProperties.Domain
-                }).promise();
+                await createUserPoolDomain(
+                    cognitoIdentityServiceProvider,
+                    event.ResourceProperties.UserPoolId,
+                    event.ResourceProperties.Domain,
+                    event.ResourceProperties.CustomDomainConfig
+                );
                 break;
                 
             case 'Update':
                 await deleteUserPoolDomain(cognitoIdentityServiceProvider, event.OldResourceProperties.Domain);
-                
-                await cognitoIdentityServiceProvider.createUserPoolDomain({
-                    UserPoolId: event.ResourceProperties.UserPoolId,
-                    Domain: event.ResourceProperties.Domain
-                }).promise();
+                await createUserPoolDomain(
+                    cognitoIdentityServiceProvider,
+                    event.ResourceProperties.UserPoolId,
+                    event.ResourceProperties.Domain,
+                    event.ResourceProperties.CustomDomainConfig
+                );
                 break;
                 
             case 'Delete':
@@ -32,6 +35,19 @@ exports.handler = async (event) => {
         console.error(`CognitoUserPoolDomain Error for request type ${event.RequestType}:`, error);
         await sendCloudFormationResponse(event, 'FAILED');
     }
+}
+
+async function createUserPoolDomain(cognitoIdentityServiceProvider, userPoolId, domain, customDomainConfig) {
+    let params = {
+        UserPoolId: userPoolId,
+        Domain: domain
+    };
+    if (customDomainConfig !== undefined) {
+        params.CustomDomainConfig = customDomainConfig;
+    }
+
+    let data = await cognitoIdentityServiceProvider.createUserPoolDomain(params).promise();
+    console.warn(`Domain ${domain} created. You must now create a CNAME pointing at ${data.CloudFrontDomain}. The UserPool Domain can not be used until this is done!`)
 }
 
 async function deleteUserPoolDomain(cognitoIdentityServiceProvider, domain) {

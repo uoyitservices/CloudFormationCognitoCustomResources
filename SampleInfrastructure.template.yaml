@@ -51,6 +51,11 @@ Resources:
                 Effect: Allow
                 Action: 'cognito-idp:DescribeUserPoolDomain'
                 Resource: '*'
+              # Required to add a Custom Domain
+              # https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-add-custom-domain.html
+              - Effect: Allow
+                Action: 'cloudfront:updateDistribution'
+                Resource: '*'
         -
           PolicyName: ManageUserPoolIdentityProviders
           PolicyDocument: 
@@ -99,6 +104,8 @@ Resources:
       Runtime: nodejs8.10
       Code: ./CloudFormationCognitoUserPoolDomain.js
       Handler: CloudFormationCognitoUserPoolDomain.handler
+      # The createUserPoolDomain() function can take a while to complete
+      Timeout: 60 # seconds
       Role: !GetAtt LambdaForCloudFormation.Arn
     DependsOn: CloudFormationSendResponse
   CloudFormationCognitoUserPoolIdentityProvider:
@@ -141,6 +148,9 @@ Resources:
       ServiceToken: !GetAtt CloudFormationCognitoUserPoolDomain.Arn
       UserPoolId: !Ref UserPoolTest
       Domain: 'userpool-test-01'
+      CustomDomainConfig:
+        CertificateArn:
+          arn:aws:acm:region:account:certificate/123456789012-1234-1234-1234-12345678
   UserPoolTestIdentityProvider:
     Type: 'Custom::CognitoUserPoolIdentityProvider'
     Properties:
