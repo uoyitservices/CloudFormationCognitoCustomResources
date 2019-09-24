@@ -42,7 +42,7 @@ async function createUserPoolDomain(cognitoIdentityServiceProvider, userPoolId, 
         UserPoolId: userPoolId,
         Domain: domain
     };
-    if (customDomainConfig !== undefined) {
+    if (customDomainConfig && customDomainConfig.CertificateArn) {
         params.CustomDomainConfig = customDomainConfig;
     }
 
