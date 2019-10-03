@@ -18,13 +18,9 @@ exports.handler = async (event) => {
                 
             case 'Update':
                 console.info(`CFE-Cognito-UserPoolFederation ${event.RequestType} - IN PROGRESS`);
-                await deleteIdentityProvider(cognitoIdentityServiceProvider, 
-                                             event.OldResourceProperties.UserPoolId,
-                                             event.OldResourceProperties.ProviderName);
-                await cognitoIdentityServiceProvider.createIdentityProvider({
+                await cognitoIdentityServiceProvider.updateIdentityProvider({
                     UserPoolId: event.ResourceProperties.UserPoolId,
                     ProviderName: event.ResourceProperties.ProviderName,
-                    ProviderType: event.ResourceProperties.ProviderType,
                     ProviderDetails: event.ResourceProperties.ProviderDetails,
                     AttributeMapping: event.ResourceProperties.AttributeMapping
                 }).promise();
