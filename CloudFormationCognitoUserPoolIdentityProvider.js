@@ -3,7 +3,7 @@ const AWS = require('aws-sdk');
 exports.handler = async (event) => {
     try {
         var cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
-        
+
         switch (event.RequestType) {
             case 'Create':
                 console.info(`CFE-Cognito-UserPoolFederation ${event.RequestType} - IN PROGRESS`);
@@ -15,7 +15,7 @@ exports.handler = async (event) => {
                     AttributeMapping: event.ResourceProperties.AttributeMapping,
                 }).promise();
                 break;
-                
+
             case 'Update':
                 console.info(`CFE-Cognito-UserPoolFederation ${event.RequestType} - IN PROGRESS`);
                 await cognitoIdentityServiceProvider.updateIdentityProvider({
@@ -25,15 +25,15 @@ exports.handler = async (event) => {
                     AttributeMapping: event.ResourceProperties.AttributeMapping
                 }).promise();
                 break;
-                
+
             case 'Delete':
                 console.info(`CFE-Cognito-UserPoolFederation ${event.RequestType} - IN PROGRESS`);
-                await deleteIdentityProvider(cognitoIdentityServiceProvider, 
+                await deleteIdentityProvider(cognitoIdentityServiceProvider,
                                              event.ResourceProperties.UserPoolId,
                                              event.ResourceProperties.ProviderName);
                 break;
         }
-        
+
         await sendCloudFormationResponse(event, 'SUCCESS');
         console.info(`CFE-Cognito-UserPoolFederation ${event.RequestType} - SUCCESS`);
     } catch (error) {
@@ -47,7 +47,7 @@ async function deleteIdentityProvider(cognitoIdentityServiceProvider, userPoolId
         UserPoolId: userPoolId,
         ProviderName: providerName
     }).promise();
-    
+
     if (response.IdentityProvider.UserPoolId) {
         await cognitoIdentityServiceProvider.deleteIdentityProvider({
             UserPoolId: response.IdentityProvider.UserPoolId,
@@ -69,10 +69,10 @@ async function sendCloudFormationResponse(event, responseStatus, responseData) {
             ResponseData: responseData
         })
     };
-    
+
     var lambda = new AWS.Lambda();
     var response = await lambda.invoke(params).promise();
-    
+
     if (response.FunctionError) {
         var responseError = JSON.parse(response.Payload);
         throw new Error(responseError.errorMessage);
