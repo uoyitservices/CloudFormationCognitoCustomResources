@@ -1,4 +1,5 @@
 const AWS = require('aws-sdk');
+const RESPONSE_FUNCTION = process.env.RESPONSE_FUNCTION;
 
 exports.handler = async (event) => {
     try {
@@ -58,7 +59,7 @@ async function deleteIdentityProvider(cognitoIdentityServiceProvider, userPoolId
 
 async function sendCloudFormationResponse(event, responseStatus, responseData) {
     var params = {
-        FunctionName: 'CloudFormationSendResponse',
+        FunctionName: RESPONSE_FUNCTION,
         InvocationType: 'RequestResponse',
         Payload: JSON.stringify({
             StackId: event.StackId,

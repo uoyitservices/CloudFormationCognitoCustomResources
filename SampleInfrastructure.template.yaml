@@ -83,7 +83,6 @@ Resources:
   CloudFormationSendResponse:
     Type: 'AWS::Lambda::Function'
     Properties:
-      FunctionName: CloudFormationSendResponse
       Runtime: nodejs8.10
       Code: ./CloudFormationSendResponse
       Handler: index.handler
@@ -96,6 +95,9 @@ Resources:
       Code: ./CloudFormationCognitoUserPoolClientSettings.js
       Handler: CloudFormationCognitoUserPoolClientSettings.handler
       Role: !GetAtt LambdaForCloudFormation.Arn
+      Environment:
+        Variables:
+          RESPONSE_FUNCTION: !GetAtt CloudFormationSendResponse.Arn
     DependsOn: CloudFormationSendResponse
   CloudFormationCognitoUserPoolDomain:
     Type: 'AWS::Lambda::Function'
@@ -107,6 +109,9 @@ Resources:
       # The createUserPoolDomain() function can take a while to complete
       Timeout: 60 # seconds
       Role: !GetAtt LambdaForCloudFormation.Arn
+      Environment:
+        Variables:
+          RESPONSE_FUNCTION: !GetAtt CloudFormationSendResponse.Arn
     DependsOn: CloudFormationSendResponse
   CloudFormationCognitoUserPoolIdentityProvider:
     Type: 'AWS::Lambda::Function'
@@ -116,6 +121,9 @@ Resources:
       Code: ./CloudFormationCognitoUserPoolIdentityProvider.js
       Handler: CloudFormationCognitoUserPoolIdentityProvider.handler
       Role: !GetAtt LambdaForCloudFormation.Arn
+      Environment:
+        Variables:
+          RESPONSE_FUNCTION: !GetAtt CloudFormationSendResponse.Arn
     DependsOn: CloudFormationSendResponse
   UserPoolTest:
     Type: 'AWS::Cognito::UserPool'
