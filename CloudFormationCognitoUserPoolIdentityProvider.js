@@ -38,7 +38,7 @@ exports.handler = async (event) => {
         console.info(`CognitoUserPoolIdentityProvider ${event.RequestType} - SUCCESS`);
     } catch (error) {
         console.error(`CognitoUserPoolIdentityProvider ${event.RequestType} - FAILED:`, error);
-        await sendCloudFormationResponse(event, 'FAILED', event);
+        await sendCloudFormationResponse(event, 'FAILED');
     }
 }
 
