@@ -6,7 +6,7 @@ exports.handler = async (event) => {
 
         switch (event.RequestType) {
             case 'Create':
-                console.info(`CFE-Cognito-UserPoolFederation ${event.RequestType} - IN PROGRESS`);
+                console.info(`CognitoUserPoolIdentityProvider ${event.RequestType} - IN PROGRESS`);
                 await cognitoIdentityServiceProvider.createIdentityProvider({
                     UserPoolId: event.ResourceProperties.UserPoolId,
                     ProviderName: event.ResourceProperties.ProviderName,
@@ -17,7 +17,7 @@ exports.handler = async (event) => {
                 break;
 
             case 'Update':
-                console.info(`CFE-Cognito-UserPoolFederation ${event.RequestType} - IN PROGRESS`);
+                console.info(`CognitoUserPoolIdentityProvider ${event.RequestType} - IN PROGRESS`);
                 await cognitoIdentityServiceProvider.updateIdentityProvider({
                     UserPoolId: event.ResourceProperties.UserPoolId,
                     ProviderName: event.ResourceProperties.ProviderName,
@@ -27,7 +27,7 @@ exports.handler = async (event) => {
                 break;
 
             case 'Delete':
-                console.info(`CFE-Cognito-UserPoolFederation ${event.RequestType} - IN PROGRESS`);
+                console.info(`CognitoUserPoolIdentityProvider ${event.RequestType} - IN PROGRESS`);
                 await deleteIdentityProvider(cognitoIdentityServiceProvider,
                                              event.ResourceProperties.UserPoolId,
                                              event.ResourceProperties.ProviderName);
@@ -35,9 +35,9 @@ exports.handler = async (event) => {
         }
 
         await sendCloudFormationResponse(event, 'SUCCESS');
-        console.info(`CFE-Cognito-UserPoolFederation ${event.RequestType} - SUCCESS`);
+        console.info(`CognitoUserPoolIdentityProvider ${event.RequestType} - SUCCESS`);
     } catch (error) {
-        console.error(`CFE-Cognito-UserPoolFederation ${event.RequestType} - FAILED:`, error);
+        console.error(`CognitoUserPoolIdentityProvider ${event.RequestType} - FAILED:`, error);
         await sendCloudFormationResponse(event, 'FAILED', event);
     }
 }
