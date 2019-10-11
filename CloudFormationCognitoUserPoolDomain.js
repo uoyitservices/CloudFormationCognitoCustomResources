@@ -52,7 +52,10 @@ async function createUserPoolDomain(cognitoIdentityServiceProvider, userPoolId, 
     }
 
     let data = await cognitoIdentityServiceProvider.createUserPoolDomain(params).promise();
-    console.warn(`Domain ${domain} created. You must now create a CNAME pointing at ${data.CloudFrontDomain}. The UserPool Domain can not be used until this is done!`)
+
+    if (data.CloudFrontDomain) {
+        console.warn(`Domain ${domain} created. You must now create a CNAME pointing at ${data.CloudFrontDomain}. The UserPool Domain can not be used until this is done!`)
+    }
 }
 
 async function deleteUserPoolDomain(cognitoIdentityServiceProvider, domain) {
