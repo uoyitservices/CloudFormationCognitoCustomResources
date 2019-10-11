@@ -2,8 +2,9 @@ const AWS = require('aws-sdk');
 const RESPONSE_FUNCTION = process.env.RESPONSE_FUNCTION;
 
 exports.handler = async (event) => {
+    let physicalResourceId = event.PhysicalResourceId;
     try {
-        var cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
+        let cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
         
         switch (event.RequestType) {
             case 'Create':
@@ -13,6 +14,9 @@ exports.handler = async (event) => {
                     event.ResourceProperties.Domain,
                     event.ResourceProperties.CustomDomainConfig
                 );
+
+                physicalResourceId = [event.StackId, event.LogicalResourceId, event.RequestId].join('/');
+
                 break;
                 
             case 'Update':
@@ -30,11 +34,11 @@ exports.handler = async (event) => {
                 break;
         }
         
-        await sendCloudFormationResponse(event, 'SUCCESS');
+        await sendCloudFormationResponse(event, 'SUCCESS', physicalResourceId);
         console.info(`CognitoUserPoolDomain Success for request type ${event.RequestType}`);
     } catch (error) {
         console.error(`CognitoUserPoolDomain Error for request type ${event.RequestType}:`, error);
-        await sendCloudFormationResponse(event, 'FAILED');
+        await sendCloudFormationResponse(event, 'FAILED', physicalResourceId);
     }
 }
 
@@ -64,7 +68,7 @@ async function deleteUserPoolDomain(cognitoIdentityServiceProvider, domain) {
     }
 }
 
-async function sendCloudFormationResponse(event, responseStatus, responseData) {
+async function sendCloudFormationResponse(event, responseStatus, physicalResourceId, responseData) {
     var params = {
         FunctionName: RESPONSE_FUNCTION,
         InvocationType: 'RequestResponse',
@@ -72,6 +76,7 @@ async function sendCloudFormationResponse(event, responseStatus, responseData) {
             StackId: event.StackId,
             RequestId: event.RequestId,
             LogicalResourceId: event.LogicalResourceId,
+            PhysicalResourceId: physicalResourceId,
             ResponseURL: event.ResponseURL,
             ResponseStatus: responseStatus,
             ResponseData: responseData

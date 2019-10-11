@@ -6,7 +6,7 @@ exports.handler = async (event, context) => {
     var responseBody = JSON.stringify({
         Status: event.ResponseStatus,
         Reason: reason,
-        PhysicalResourceId: context.logStreamName,
+        PhysicalResourceId: event.PhysicalResourceId || context.logStreamName,
         StackId: event.StackId,
         RequestId: event.RequestId,
         LogicalResourceId: event.LogicalResourceId,
